@@ -25,6 +25,14 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Apply migrations at startup
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
+
+
 // Enable Swagger middleware in dev
 if (app.Environment.IsDevelopment())
 {

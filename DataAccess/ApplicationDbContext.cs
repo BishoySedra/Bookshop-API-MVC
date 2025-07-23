@@ -10,11 +10,12 @@ namespace DataAccess
         {
         }
 
-        // DbSets
+        // DbSets for each entity in the application
         public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             // Apply all Fluent API configurations from the Models project
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(Category).Assembly);
 
