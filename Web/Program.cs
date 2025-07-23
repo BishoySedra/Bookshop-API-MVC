@@ -1,6 +1,7 @@
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add controllers
-builder.Services.AddControllers();
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+{
+    // Use custom validation error handler
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        return ValidationErrorHandler.CustomModelStateResponse(context);
+    };
+});
 
 // Add Swagger support
 builder.Services.AddEndpointsApiExplorer();
@@ -32,6 +40,8 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
+// Register custom error handling middleware BEFORE other middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Enable Swagger middleware in dev
 if (app.Environment.IsDevelopment())

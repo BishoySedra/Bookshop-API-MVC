@@ -2,6 +2,7 @@
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities;
+using Web.Responses;
 
 namespace Web.Controllers
 {
@@ -16,34 +17,22 @@ namespace Web.Controllers
             _context = context;
         }
 
-        // GET: api/categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
+        public async Task<ActionResult<ApiResponse<List<Category>>>> GetAllCategories()
         {
-            // Fetch all categories from the database asynchronously
             var categories = await _context.Categories.ToListAsync();
-
-            // Return the list of categories
-            return Ok(categories);
+            return Ok(ApiResponse<List<Category>>.Success(categories));
         }
 
-        // POST: api/categories
         [HttpPost]
-        public async Task<ActionResult<Category>> CreateCategory([FromBody] Category category)
+        public async Task<ActionResult<ApiResponse<Category>>> CreateCategory(Category category)
         {
-            // Validate the incoming category object
-            if (!ModelState.IsValid) { 
-                return BadRequest(ModelState);
-            }
-
-            // Add the new category to the database
             _context.Categories.Add(category);
-
-            // Save changes asynchronously
             await _context.SaveChangesAsync();
-
-            // Return the created category with a 201 Created response
-            return CreatedAtAction(nameof(GetAllCategories), new { id = category.Id }, category);
+            return CreatedAtAction(nameof(GetAllCategories), new { id = category.Id },
+                ApiResponse<Category>.Success(category, "Category created", 201));
         }
     }
+
+
 }
