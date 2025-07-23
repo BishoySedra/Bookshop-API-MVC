@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Reflection.Emit;
 using Models.Entities;
 
 namespace DataAccess
@@ -17,7 +15,7 @@ namespace DataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Apply all configurations from the Models project
+            // Apply all Fluent API configurations from the Models project
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(Category).Assembly);
 
             base.OnModelCreating(modelBuilder);
