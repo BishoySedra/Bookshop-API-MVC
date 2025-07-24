@@ -46,7 +46,7 @@ BookShop API is a web application built with ASP.NET Core 8.0. It provides funct
 
 ### 1. Clone the repository:
 ```sh
-git clone https://github.com/BishoySedra/EVA-Dotnet-Task-1.git
+git clone https://github.com/BishoySedra/Bookshop-API-MVC.git
 cd EVA-Dotnet-Task-1
 ```
 
