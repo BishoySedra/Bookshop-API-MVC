@@ -1,0 +1,29 @@
+﻿@model IEnumerable<Models.Entities.Category>
+
+@{
+    ViewData["Title"] = "Category List";
+}
+
+<h2>Category List</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Category Name</th>
+            <th>Category Order</th>
+            <th>Is Active</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+                <tr>
+                    <td>@item.catName</td>
+                    <td>@item.catOrder</td>
+                    <td>@(item.markedAsDeleted ? "No" : "Yes")</td>
+                </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-success">Create New Category</a>
