@@ -4,6 +4,19 @@ BookShop API is a web application built with ASP.NET Core 8.0. It provides funct
 
 ---
 
+## Agenda
+
+This README covers the following topics:
+
+1. [Features](#features)
+2. [Project Structure](#project-structure)
+3. [Prerequisites](#prerequisites)
+4. [Getting Started](#getting-started)
+5. [Using Docker for SQL Server](#using-docker-for-sql-server)
+6. [Technologies Used](#technologies-used)
+
+---
+
 ## Features
 
 - **Book Category Management**: Create, read, update, and delete book categories.
