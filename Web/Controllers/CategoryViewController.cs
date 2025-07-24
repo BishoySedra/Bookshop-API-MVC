@@ -111,5 +111,23 @@ namespace Web.Controllers
             return PartialView("DetailsPartial", category);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EditCategory(Category model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var category = _context.Categories.FirstOrDefault(c => c.Id == model.Id);
+            if (category == null) return NotFound();
+
+            category.catName = model.catName;
+            category.catOrder = model.catOrder;
+            category.markedAsDeleted = model.markedAsDeleted; // ✅ Include this line
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+
     }
 }
