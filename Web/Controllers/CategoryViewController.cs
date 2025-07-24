@@ -27,6 +27,38 @@ namespace Web.Controllers
             return View();
         }
 
+        // GET: Edit
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            if (category == null) return NotFound();
+            return View(category);
+        }
+
+        // GET: Details
+        [HttpGet]
+        public IActionResult Details(int id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            if (category == null) return NotFound();
+            return View(category);
+        }
+
+        // GET: Delete (Confirmation triggered by SweetAlert)
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null) return NotFound();
+
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCategoryViewModel model)
@@ -46,5 +78,38 @@ namespace Web.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        [HttpGet]
+        public IActionResult EditPartial(int id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            if (category == null) return NotFound();
+            return PartialView("EditPartial", category);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(Category model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var category = _context.Categories.FirstOrDefault(c => c.Id == model.Id);
+            if (category == null) return NotFound();
+
+            category.catName = model.catName;
+            category.catOrder = model.catOrder;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public IActionResult DetailsPartial(int id)
+        {
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            if (category == null) return NotFound();
+            return PartialView("DetailsPartial", category);
+        }
+
     }
 }

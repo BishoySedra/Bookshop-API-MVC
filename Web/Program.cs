@@ -9,7 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().ConfigureApiBehaviorOptions(options =>
+    {
+        // Use custom validation error handler
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            return ValidationErrorHandler.CustomModelStateResponse(context);
+        };
+    });
 
 // Add Swagger support
 builder.Services.AddEndpointsApiExplorer();
@@ -33,7 +40,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Register custom error handling middleware BEFORE other middleware
-//app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Enable Swagger middleware in dev
 if (app.Environment.IsDevelopment())

@@ -1,0 +1,8 @@
+﻿@model Models.Entities.Category
+
+<div>
+    <p><strong>Name:</strong> @Model.catName</p>
+    <p><strong>Order:</strong> @Model.catOrder</p>
+    <p><strong>Created At:</strong> @Model.createdDate.ToString("dd MMM yyyy")</p>
+    <p><strong>Status:</strong> @(Model.markedAsDeleted ? "Inactive" : "Active")</p>
+</div>
