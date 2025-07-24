@@ -6,8 +6,6 @@ BookShop API is a web application built with ASP.NET Core 8.0. It provides funct
 
 ## Agenda
 
-This README covers the following topics:
-
 1. [Features](#features)
 2. [Project Structure](#project-structure)
 3. [Prerequisites](#prerequisites)
