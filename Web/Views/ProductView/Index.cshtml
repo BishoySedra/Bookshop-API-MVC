@@ -37,7 +37,7 @@
                                         <td>@item.Description</td>
                                         <td>@item.Author</td>
                                         <td>@item.Price</td>
-                                        <td>@item.Category?.catName</td>
+                                        <td>@item.Category.catName</td>
                                         <td>
                                             <div class="d-flex justify-content-center gap-2">
                                                     <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal"
@@ -121,12 +121,12 @@
 
                 $('#editModal').on('show.bs.modal', function (e) {
                     const id = $(e.relatedTarget).data('id');
-                    $('#editModalBody').load(`/CategoryView/EditPartial/${id}`);
+                    $('#editModalBody').load(`/ProductView/EditPartial/${id}`);
                 });
 
                 $('#detailsModal').on('show.bs.modal', function (e) {
                     const id = $(e.relatedTarget).data('id');
-                    $('#detailsModalBody').load(`/CategoryView/DetailsPartial/${id}`);
+                    $('#detailsModalBody').load(`/ProductView/DetailsPartial/${id}`);
                 });
             </script>
 }
