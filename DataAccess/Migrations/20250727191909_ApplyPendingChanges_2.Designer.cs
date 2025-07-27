@@ -3,6 +3,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250727191909_ApplyPendingChanges_2")]
+    partial class ApplyPendingChanges_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -58,27 +61,6 @@ namespace DataAccess.Migrations
                             Id = 2,
                             catName = "Science",
                             catOrder = 2,
-                            markedAsDeleted = false
-                        },
-                        new
-                        {
-                            Id = 3,
-                            catName = "History",
-                            catOrder = 3,
-                            markedAsDeleted = false
-                        },
-                        new
-                        {
-                            Id = 4,
-                            catName = "Technology",
-                            catOrder = 4,
-                            markedAsDeleted = false
-                        },
-                        new
-                        {
-                            Id = 5,
-                            catName = "Philosophy",
-                            catOrder = 5,
                             markedAsDeleted = false
                         });
                 });
@@ -145,69 +127,6 @@ namespace DataAccess.Migrations
                             Description = "Classic dystopia",
                             Price = 39.990000000000002,
                             Title = "Brave New World"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Author = "Yuval Noah Harari",
-                            CategoryId = 3,
-                            Description = "A brief history of humankind",
-                            Price = 64.989999999999995,
-                            Title = "Sapiens"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Author = "Robert C. Martin",
-                            CategoryId = 4,
-                            Description = "Best practices for writing clean code",
-                            Price = 74.989999999999995,
-                            Title = "Clean Code"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            Author = "Marcus Aurelius",
-                            CategoryId = 5,
-                            Description = "Thoughts of Marcus Aurelius",
-                            Price = 29.989999999999998,
-                            Title = "Meditations"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Author = "Neil deGrasse Tyson",
-                            CategoryId = 2,
-                            Description = "Science made simple",
-                            Price = 41.990000000000002,
-                            Title = "Astrophysics for People in a Hurry"
-                        },
-                        new
-                        {
-                            Id = 8,
-                            Author = "Richard Dawkins",
-                            CategoryId = 2,
-                            Description = "Evolution explained",
-                            Price = 52.990000000000002,
-                            Title = "The Selfish Gene"
-                        },
-                        new
-                        {
-                            Id = 9,
-                            Author = "Sun Tzu",
-                            CategoryId = 3,
-                            Description = "Classic Chinese military treatise",
-                            Price = 24.989999999999998,
-                            Title = "The Art of War"
-                        },
-                        new
-                        {
-                            Id = 10,
-                            Author = "Plato",
-                            CategoryId = 5,
-                            Description = "Philosophical dialogue by Plato",
-                            Price = 34.990000000000002,
-                            Title = "The Republic"
                         });
                 });
 
