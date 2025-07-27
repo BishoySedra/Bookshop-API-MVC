@@ -1,0 +1,133 @@
+﻿@model IEnumerable<Models.Entities.Product>
+
+@{
+    ViewData["Title"] = "Product List";
+    Layout = "../Shared/_Layout";
+}
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary fw-semibold">
+            <i class="bi bi-list-ul me-2"></i> Product List
+        </h2>
+        <a asp-controller="ProductView" asp-action="Create" class="btn btn-success btn-lg shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Create New Product
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered align-middle mb-0">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Author</th>
+                            <th scope="col">price</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                                    <tr class="text-center">
+                                        <td class="text-start">@item.Title</td>
+                                        <td>@item.Description</td>
+                                        <td>@item.Author</td>
+                                        <td>@item.Price</td>
+                                        <td>@item.Category?.catName</td>
+                                        <td>
+                                            <div class="d-flex justify-content-center gap-2">
+                                                    <a href="#" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                                                       data-bs-target="#editModal" data-id="@item.Id">
+                                                        <i class="bi bi-pencil-square"></i> Edit
+                                                    </a>
+                                                    <a href="#" class="btn btn-sm btn-info text-white" data-bs-toggle="modal"
+                                                       data-bs-target="#detailsModal" data-id="@item.Id">
+                                                        <i class="bi bi-eye-fill"></i> Details
+                                                    </a>
+
+                                                    <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete('@Url.Action("Delete", "ProductView", new { id = item.Id })')">
+                                                    <i class="bi bi-trash-fill"></i> Delete
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="editModalLabel">Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="editModalBody">
+                <div class="text-center text-muted py-5">
+                    <div class="spinner-border text-warning" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="detailsModalLabel">Category Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+                <div class="text-center text-muted py-5">
+                    <div class="spinner-border text-info" role="status"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                function confirmDelete(deleteUrl) {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "This will permanently delete the category.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, delete it!',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = deleteUrl;
+                        }
+                    });
+                }
+
+                $('#editModal').on('show.bs.modal', function (e) {
+                    const id = $(e.relatedTarget).data('id');
+                    $('#editModalBody').load(`/CategoryView/EditPartial/${id}`);
+                });
+
+                $('#detailsModal').on('show.bs.modal', function (e) {
+                    const id = $(e.relatedTarget).data('id');
+                    $('#detailsModalBody').load(`/CategoryView/DetailsPartial/${id}`);
+                });
+            </script>
+}
+
