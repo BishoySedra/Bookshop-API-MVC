@@ -1,4 +1,4 @@
-﻿@model Web.ViewModels.Product.EditProductViewModel
+﻿@model Models.Entities.Product
 
 <form asp-action="EditPartial" asp-controller="ProductView" method="post">
     <input type="hidden" asp-for="Id" />
@@ -25,6 +25,14 @@
         <label asp-for="Price" class="form-label">Price</label>
         <input asp-for="Price" class="form-control" />
         <span asp-validation-for="Price" class="text-danger small"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryList">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger small"></span>
     </div>
 
     <div class="d-flex justify-content-end">

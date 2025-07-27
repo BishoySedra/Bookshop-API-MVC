@@ -57,26 +57,17 @@ namespace Web.Controllers
             var product = await _context.Products.FindAsync(id);
             if (product == null) return NotFound();
 
-            var categories = await _context.Categories.ToListAsync();
+            ViewBag.CategoryList = new SelectList(await _context.Categories.ToListAsync(), "Id", "catName", product.CategoryId);
 
-            var viewModel = new EditProductViewModel
-            {
-                Id = product.Id,
-                Title = product.Title,
-                Description = product.Description,
-                Author = product.Author,
-                Price = product.Price,
-                CategoryId = product.CategoryId
-            };
-
-            return PartialView("_EditPartial", viewModel);
+            return PartialView("_EditPartial", product);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditPartial(EditProductViewModel model)
+        public async Task<IActionResult> EditPartial(Product model)
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.CategoryList = new SelectList(await _context.Categories.ToListAsync(), "Id", "catName", model.CategoryId);
                 return PartialView("_EditPartial", model);
             }
 
@@ -87,6 +78,7 @@ namespace Web.Controllers
             product.Description = model.Description;
             product.Author = model.Author;
             product.Price = model.Price;
+            product.CategoryId = model.CategoryId;
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
