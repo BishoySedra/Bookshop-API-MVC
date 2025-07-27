@@ -34,6 +34,12 @@ namespace DataAccess.Configurations
                    .HasColumnName("BookPrice");
 
             // Validation for price range (1-1000) – done in application-level validation, not DB
+
+            builder.HasOne(p => p.Category)
+                   .WithMany(c => c.Products)
+                   .HasForeignKey(p => p.CategoryId)
+                   .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }

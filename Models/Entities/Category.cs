@@ -20,6 +20,9 @@
         // [Column("isDeleted")]
         public bool markedAsDeleted { get; set; }
 
+        // navigation property
+        public ICollection<Product> Products { get; set; }
+
         #endregion
     }
 }

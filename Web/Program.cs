@@ -1,4 +1,6 @@
 using DataAccess;
+using DataAccess.Interfaces;
+using DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Web.Middleware;
@@ -9,6 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Register repositories
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+// Register custom error handling middleware
 builder.Services.AddControllersWithViews().ConfigureApiBehaviorOptions(options =>
     {
         // Use custom validation error handler
