@@ -17,7 +17,7 @@ namespace Web.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            var categories = _context.Categories.ToList();
+            var categories = _context.Categories.OrderBy(c => c.catOrder).ThenByDescending(c => c.catName).ToList();
             return View(categories);
         }
 
