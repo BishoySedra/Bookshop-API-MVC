@@ -48,7 +48,7 @@ namespace Web.Controllers
             if (product == null)
                 return NotFound();
 
-            return PartialView("_DetailsPartial", product);
+            return PartialView("DetailsPartial", product);
         }
 
         [HttpGet]
@@ -59,7 +59,7 @@ namespace Web.Controllers
 
             ViewBag.CategoryList = new SelectList(await _context.Categories.ToListAsync(), "Id", "catName", product.CategoryId);
 
-            return PartialView("_EditPartial", product);
+            return PartialView("EditPartial", product);
         }
 
         [HttpPost]
@@ -68,7 +68,7 @@ namespace Web.Controllers
             if (!ModelState.IsValid)
             {
                 ViewBag.CategoryList = new SelectList(await _context.Categories.ToListAsync(), "Id", "catName", model.CategoryId);
-                return PartialView("_EditPartial", model);
+                return PartialView("EditPartial", model);
             }
 
             var product = await _context.Products.FindAsync(model.Id);
