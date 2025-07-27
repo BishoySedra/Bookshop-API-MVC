@@ -2,6 +2,8 @@
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Web.ViewModels.Product;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Models.Entities;
 
 namespace Web.Controllers
 {
@@ -92,6 +94,50 @@ namespace Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            var categories = await _context.Categories.ToListAsync();
 
+            ViewBag.CategoryList = new SelectList(categories, "Id", "catName");
+
+            // Return empty Product object so view still uses @model Product
+            return View(new Product());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateProductViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var categories = await _context.Categories.ToListAsync();
+                ViewBag.CategoryList = new SelectList(categories, "Id", "catName", model.CategoryId);
+
+                // Returning Product entity so view model stays the same
+                return View(new Product
+                {
+                    Title = model.Title,
+                    Description = model.Description,
+                    Author = model.Author,
+                    Price = model.Price,
+                    CategoryId = model.CategoryId
+                });
+            }
+
+            var product = new Product
+            {
+                Title = model.Title,
+                Description = model.Description,
+                Author = model.Author,
+                Price = model.Price,
+                CategoryId = model.CategoryId
+            };
+
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

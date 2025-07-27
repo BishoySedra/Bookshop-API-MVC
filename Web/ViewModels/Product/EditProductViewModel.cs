@@ -16,11 +16,11 @@ namespace Web.ViewModels.Product
         [Required]
         public string Author { get; set; }
 
-        [Range(0.01, double.MaxValue)]
+        [Range(1, 1000)]
         public double Price { get; set; }
 
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
-        
+
     }
 }
