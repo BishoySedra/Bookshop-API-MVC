@@ -20,7 +20,7 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<ActionResult<ApiResponse<List<Category>>>> GetAllCategories()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.Include(c => c.Products).ToListAsync();
             return Ok(ApiResponse<List<Category>>.Success(categories));
         }
 

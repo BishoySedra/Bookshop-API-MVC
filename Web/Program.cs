@@ -3,6 +3,7 @@ using DataAccess.Interfaces;
 using DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
 using Web.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Register repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+// Register services to resolve dependencies
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+
 
 // Register custom error handling middleware
 builder.Services.AddControllersWithViews().ConfigureApiBehaviorOptions(options =>
@@ -46,7 +55,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Register custom error handling middleware BEFORE other middleware
-app.UseMiddleware<ExceptionHandlingMiddleware>();
+//app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Enable Swagger middleware in dev
 if (app.Environment.IsDevelopment())
@@ -64,6 +73,8 @@ app.UseStaticFiles(); // Required to serve CSS/JS/etc
 app.UseRouting();     // Required for routing to views/controllers
 
 app.UseAuthorization();
+
+app.MapControllers(); // Map API controllers
 
 app.MapControllerRoute(
     name: "default",

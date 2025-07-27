@@ -35,10 +35,11 @@ namespace DataAccess.Configurations
 
             // Validation for price range (1-1000) – done in application-level validation, not DB
 
+            // Relationship one-to-many ==> one Category can have many Products
             builder.HasOne(p => p.Category)
                    .WithMany(c => c.Products)
                    .HasForeignKey(p => p.CategoryId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Cascade); // Optional: specify delete behavior
 
         }
     }

@@ -1,92 +1,52 @@
-﻿using DataAccess;
-using DataAccess.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
+using DataAccess;
+using Microsoft.EntityFrameworkCore;
 using Models.Entities;
-using System;
+using Web.Responses;
+using Web.DTOs;
 
 namespace Web.Controllers
 {
+
+    [ApiController]
+    [Route("api/[controller]")]
+
     public class ProductController : Controller
     {
-        private readonly IProductRepository _repo;
-        private readonly ApplicationDbContext _context;
+       private readonly ApplicationDbContext _context;
 
-        public ProductController(IProductRepository repo, ApplicationDbContext context)
+        public ProductController(ApplicationDbContext context)
         {
-            _repo = repo;
             _context = context;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<ActionResult<ApiResponse<List<ProductDto>>>> GetAllProducts()
         {
-            var products = _repo.GetAll();
-            return View(products);
+            var products = await _context.Products
+                .Include(p => p.Category)
+                .Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    Author = p.Author,
+                    Price = p.Price,
+                    CategoryName = p.Category.catName
+                })
+                .ToListAsync();
+
+            return Ok(ApiResponse<List<ProductDto>>.Success(products));
         }
 
-        public IActionResult Create()
-        {
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
-            return View();
-        }
+
 
         [HttpPost]
-        public IActionResult Create(Product product)
+        public async Task<ActionResult<ApiResponse<Product>>> CreateProduct(Product product)
         {
-            if (ModelState.IsValid)
-            {
-                _repo.Create(product);
-                _repo.Save();
-                return RedirectToAction("Index");
-            }
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name");
-            return View(product);
-        }
-
-        public IActionResult Edit(int id)
-        {
-            var product = _repo.GetById(id);
-            if (product == null) return NotFound();
-
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
-        }
-
-        [HttpPost]
-        public IActionResult Edit(Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                _repo.Update(product);
-                _repo.Save();
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.Categories = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
-        }
-
-        public IActionResult Delete(int id)
-        {
-            var product = _repo.GetById(id);
-            if (product == null) return NotFound();
-
-            return View(product);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            _repo.Delete(id);
-            _repo.Save();
-            return RedirectToAction("Index");
-        }
-
-        public IActionResult Details(int id)
-        {
-            var product = _repo.GetById(id);
-            if (product == null) return NotFound();
-            return View(product);
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetAllProducts), new { id = product.Id }, ApiResponse<Product>.Success(product, "Product created", 201));
         }
     }
 
