@@ -55,7 +55,7 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Register custom error handling middleware BEFORE other middleware
-//app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Enable Swagger middleware in dev
 if (app.Environment.IsDevelopment())

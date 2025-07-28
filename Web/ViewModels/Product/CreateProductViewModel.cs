@@ -4,10 +4,15 @@ namespace Web.ViewModels.Product
 {
     public class CreateProductViewModel
     {
+        [Required(ErrorMessage = "Title is required.")]
+        [MaxLength(50, ErrorMessage = "Title must not exceed 50 characters.")]
         public string Title { get; set; }
 
+        [MaxLength(250, ErrorMessage = "Description must not exceed 250 characters.")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "Author is required.")]
+        [MaxLength(50, ErrorMessage = "Author name must not exceed 50 characters.")]
         public string Author { get; set; }
 
         [Required]
