@@ -1,6 +1,4 @@
 using DataAccess;
-using DataAccess.Interfaces;
-using DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
@@ -11,9 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Register DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Register repositories
-builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 // Register services to resolve dependencies
 builder.Services.AddControllers()
