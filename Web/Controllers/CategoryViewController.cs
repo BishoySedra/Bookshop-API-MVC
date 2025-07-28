@@ -1,30 +1,23 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using DataAccess;
-using Microsoft.EntityFrameworkCore;
+using Core.Interfaces;
 using Models.Entities;
 using Web.ViewModels.Category;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Web.Controllers
 {
     public class CategoryViewController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryViewController(ApplicationDbContext context)
+        public CategoryViewController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var categories = await _context.Categories
-                .OrderBy(c => c.catOrder)
-                .ThenByDescending(c => c.catName)
-                .ToListAsync();
-
+            var categories = await _unitOfWork.Categories.GetAllAsync();
             return View(categories);
         }
 
@@ -34,42 +27,12 @@ namespace Web.Controllers
             return View();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-            if (category == null) return NotFound();
-            return View(category);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Details(int id)
-        {
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-            if (category == null) return NotFound();
-            return View(category);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null) return NotFound();
-
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction(nameof(Index));
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCategoryViewModel model)
         {
             if (!ModelState.IsValid)
-            {
                 return View(model);
-            }
 
             var category = new Category
             {
@@ -77,17 +40,18 @@ namespace Web.Controllers
                 catOrder = model.CatOrder
             };
 
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
+            _unitOfWork.Categories.Add(category);
+            await _unitOfWork.SaveAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditPartial(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
             if (category == null) return NotFound();
-            return PartialView("EditPartial", category);
+            return View(category);
         }
 
         [HttpPost]
@@ -96,20 +60,48 @@ namespace Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == model.Id);
+            var category = await _unitOfWork.Categories.GetByIdAsync(model.Id);
             if (category == null) return NotFound();
 
             category.catName = model.catName;
             category.catOrder = model.catOrder;
-            await _context.SaveChangesAsync();
+
+            await _unitOfWork.SaveAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null) return NotFound();
+            return View(category);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null) return NotFound();
+
+            _unitOfWork.Categories.Remove(category);
+            await _unitOfWork.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
+        public async Task<IActionResult> EditPartial(int id)
+        {
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
+            if (category == null) return NotFound();
+            return PartialView("EditPartial", category);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> DetailsPartial(int id)
         {
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            var category = await _unitOfWork.Categories.GetByIdAsync(id);
             if (category == null) return NotFound();
             return PartialView("DetailsPartial", category);
         }
@@ -120,14 +112,14 @@ namespace Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == model.Id);
+            var category = await _unitOfWork.Categories.GetByIdAsync(model.Id);
             if (category == null) return NotFound();
 
             category.catName = model.catName;
             category.catOrder = model.catOrder;
             category.markedAsDeleted = model.markedAsDeleted;
 
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveAsync();
             return RedirectToAction(nameof(Index));
         }
     }
