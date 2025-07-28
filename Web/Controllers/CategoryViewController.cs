@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using DataAccess;
+using Microsoft.EntityFrameworkCore;
 using Models.Entities;
 using Web.ViewModels.Category;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Web.Controllers
 {
@@ -15,9 +18,13 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var categories = _context.Categories.OrderBy(c => c.catOrder).ThenByDescending(c => c.catName).ToList();
+            var categories = await _context.Categories
+                .OrderBy(c => c.catOrder)
+                .ThenByDescending(c => c.catName)
+                .ToListAsync();
+
             return View(categories);
         }
 
@@ -27,25 +34,22 @@ namespace Web.Controllers
             return View();
         }
 
-        // GET: Edit
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
             if (category == null) return NotFound();
             return View(category);
         }
 
-        // GET: Details
         [HttpGet]
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
             if (category == null) return NotFound();
             return View(category);
         }
 
-        // GET: Delete (Confirmation triggered by SweetAlert)
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -57,7 +61,6 @@ namespace Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -80,9 +83,9 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditPartial(int id)
+        public async Task<IActionResult> EditPartial(int id)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
             if (category == null) return NotFound();
             return PartialView("EditPartial", category);
         }
@@ -93,7 +96,7 @@ namespace Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var category = _context.Categories.FirstOrDefault(c => c.Id == model.Id);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == model.Id);
             if (category == null) return NotFound();
 
             category.catName = model.catName;
@@ -104,9 +107,9 @@ namespace Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult DetailsPartial(int id)
+        public async Task<IActionResult> DetailsPartial(int id)
         {
-            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
             if (category == null) return NotFound();
             return PartialView("DetailsPartial", category);
         }
@@ -117,17 +120,15 @@ namespace Web.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var category = _context.Categories.FirstOrDefault(c => c.Id == model.Id);
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == model.Id);
             if (category == null) return NotFound();
 
             category.catName = model.catName;
             category.catOrder = model.catOrder;
-            category.markedAsDeleted = model.markedAsDeleted; // ✅ Include this line
+            category.markedAsDeleted = model.markedAsDeleted;
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
-
     }
 }
