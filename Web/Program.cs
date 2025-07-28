@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using System.Text.Json.Serialization;
 using Web.Middleware;
 using Core.Interfaces;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,7 +42,12 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1",
         Description = "API for managing book categories"
     });
+
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
+
+
 
 var app = builder.Build();
 
