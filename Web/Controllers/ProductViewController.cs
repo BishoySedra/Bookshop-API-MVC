@@ -4,36 +4,37 @@ using Microsoft.EntityFrameworkCore;
 using Web.ViewModels.Product;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Models.Entities;
+using Core.Interfaces;
 
 namespace Web.Controllers
 {
 	public class ProductViewController : Controller
 	{
-		private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-		public ProductViewController(ApplicationDbContext context)
+		public ProductViewController(IUnitOfWork unitOfWork)
 		{
-			_context = context;
+            _unitOfWork = unitOfWork;
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> Index()
 		{
-            var products = await _context.Products.Include(p => p.Category).ToListAsync();
+            var products = await _unitOfWork.Products.GetAllWithCategoriesAsync();
             return View(products);
 		}
 
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _unitOfWork.Products.GetByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            _unitOfWork.Products.Remove(product);
+            await _unitOfWork.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -41,9 +42,7 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IActionResult> DetailsPartial(int id)
         {
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var product = await _unitOfWork.Products.GetByIdWithCategoryAsync(id);
 
             if (product == null)
                 return NotFound();
@@ -54,10 +53,10 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IActionResult> EditPartial(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _unitOfWork.Products.GetByIdAsync(id);
             if (product == null) return NotFound();
 
-            ViewBag.CategoryList = new SelectList(await _context.Categories.ToListAsync(), "Id", "catName", product.CategoryId);
+            ViewBag.CategoryList = new SelectList(await _unitOfWork.Categories.GetAllAsync(), "Id", "catName", product.CategoryId);
 
             return PartialView("EditPartial", product);
         }
@@ -67,11 +66,11 @@ namespace Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                ViewBag.CategoryList = new SelectList(await _context.Categories.ToListAsync(), "Id", "catName", model.CategoryId);
+                ViewBag.CategoryList = new SelectList(await _unitOfWork.Products.GetAllAsync(), "Id", "catName", model.CategoryId);
                 return PartialView("EditPartial", model);
             }
 
-            var product = await _context.Products.FindAsync(model.Id);
+            var product = await _unitOfWork.Products.GetByIdAsync(model.Id);
             if (product == null) return NotFound();
 
             product.Title = model.Title;
@@ -80,8 +79,7 @@ namespace Web.Controllers
             product.Price = model.Price;
             product.CategoryId = model.CategoryId;
 
-            _context.Products.Update(product);
-            await _context.SaveChangesAsync();
+            await _unitOfWork.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -89,7 +87,7 @@ namespace Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            var categories = await _context.Categories.ToListAsync();
+            var categories = await _unitOfWork.Categories.GetAllAsync();
 
             ViewBag.CategoryList = new SelectList(categories, "Id", "catName");
 
@@ -103,7 +101,7 @@ namespace Web.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var categories = await _context.Categories.ToListAsync();
+                var categories = await _unitOfWork.Categories.GetAllAsync();
                 ViewBag.CategoryList = new SelectList(categories, "Id", "catName", model.CategoryId);
 
                 // Returning Product entity so view model stays the same
@@ -126,8 +124,8 @@ namespace Web.Controllers
                 CategoryId = model.CategoryId
             };
 
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            _unitOfWork.Products.Add(product);
+            await _unitOfWork.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }

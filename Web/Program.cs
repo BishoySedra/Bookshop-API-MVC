@@ -7,33 +7,31 @@ using Core.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register DbContext
+// DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Register repositories and unit of work
+// Repositories + UoW
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-// Register services to resolve dependencies
-builder.Services.AddControllers()
+// Controllers + Views + Custom JSON + Validation Handler
+builder.Services
+    .AddControllersWithViews()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    });
-
-
-// Register custom error handling middleware
-builder.Services.AddControllersWithViews().ConfigureApiBehaviorOptions(options =>
+    })
+    .ConfigureApiBehaviorOptions(options =>
     {
-        // Use custom validation error handler
         options.InvalidModelStateResponseFactory = context =>
         {
             return ValidationErrorHandler.CustomModelStateResponse(context);
         };
     });
 
-// Add Swagger support
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -47,17 +45,16 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Apply migrations at startup
+// Migrate DB
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 }
 
-// Register custom error handling middleware BEFORE other middleware
+// Middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Enable Swagger middleware in dev
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -68,14 +65,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
 
-app.UseStaticFiles(); // Required to serve CSS/JS/etc
-app.UseRouting();     // Required for routing to views/controllers
+// when using authentication, will uncomment the next line
+// app.UseAuthentication();
 
 app.UseAuthorization();
 
-app.MapControllers(); // Map API controllers
-
+app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=CategoryView}/{action=Index}/{id?}"

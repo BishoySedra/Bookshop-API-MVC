@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Models.Entities;
 using Web.Responses;
 using Web.DTOs;
+using Core.Interfaces;
 
 namespace Web.Controllers
 {
@@ -13,30 +14,25 @@ namespace Web.Controllers
 
     public class ProductController : Controller
     {
-       private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductController(ApplicationDbContext context)
+        public ProductController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
         public async Task<ActionResult<ApiResponse<List<ProductDto>>>> GetAllProducts()
         {
-            var products = await _context.Products
-                .Include(p => p.Category)
-                .Select(p => new ProductDto
-                {
-                    Id = p.Id,
-                    Title = p.Title,
-                    Description = p.Description,
-                    Author = p.Author,
-                    Price = p.Price,
-                    CategoryName = p.Category.catName
-                })
-                .ToListAsync();
+            var products = await _unitOfWork.Products.GetAllWithCategoriesAsync();
 
-            return Ok(ApiResponse<List<ProductDto>>.Success(products));
+            return Ok(ApiResponse<List<ProductDto>>.Success(products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Price = p.Price,
+                CategoryName = p.Category?.catName
+            }).ToList(), "Products retrieved successfully"));
         }
 
 
@@ -44,9 +40,10 @@ namespace Web.Controllers
         [HttpPost]
         public async Task<ActionResult<ApiResponse<Product>>> CreateProduct(Product product)
         {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetAllProducts), new { id = product.Id }, ApiResponse<Product>.Success(product, "Product created", 201));
+            _unitOfWork.Products.Add(product);
+            await _unitOfWork.SaveAsync();
+            return CreatedAtAction(nameof(GetAllProducts), new { id = product.Id },
+                               ApiResponse<Product>.Success(product, "Product created successfully", 201));
         }
     }
 
