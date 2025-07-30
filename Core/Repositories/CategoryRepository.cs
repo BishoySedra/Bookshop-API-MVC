@@ -1,31 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Models.Entities;
+using Core.Interfaces;
+using DataAccess.Repositories;
 using DataAccess;
 
-public class CategoryRepository : ICategoryRepository
+public class CategoryRepository : GenericRepository<Category>, ICategoryRepository
 {
-    private readonly ApplicationDbContext _context;
 
-    public CategoryRepository(ApplicationDbContext context)
+    public CategoryRepository(DbContext context) : base(context)
     {
-        _context = context;
     }
 
-    public async Task<List<Category>> GetAllAsync() =>
-        await _context.Categories
-            .OrderBy(c => c.catOrder)
-            .ThenByDescending(c => c.catName)
+    public async Task<List<Category>> GetAllWithProductsAsync()
+    {
+        // Cast base DbContext (_context) to mainContext to access Categories DbSet
+        var context = _context as ApplicationDbContext;
+
+        return await _context.Set<Category>()
+            .Include(c => c.Products)
             .ToListAsync();
-
-    public async Task<List<Category>> GetAllWithProductsAsync() =>
-        await _context.Categories.Include(c => c.Products).ToListAsync();
-
-    public async Task<Category> GetByIdAsync(int id) =>
-        await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
-
-    public void Add(Category category) =>
-        _context.Categories.Add(category);
-
-    public void Remove(Category category) =>
-        _context.Categories.Remove(category);
+    }
 }

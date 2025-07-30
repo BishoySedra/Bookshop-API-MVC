@@ -1,10 +1,9 @@
 ﻿using Models.Entities;
 
-public interface ICategoryRepository
+namespace Core.Interfaces
 {
-    Task<List<Category>> GetAllAsync();
-    Task<List<Category>> GetAllWithProductsAsync();
-    Task<Category?> GetByIdAsync(int id);
-    void Add(Category category);
-    void Remove(Category category);
+    public interface ICategoryRepository : IGenericRepository<Category>
+    {
+        Task<List<Category>> GetAllWithProductsAsync();
+    }
 }
